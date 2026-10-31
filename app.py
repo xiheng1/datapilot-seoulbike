@@ -101,7 +101,7 @@ else:
         df_raw = pd.read_excel(src, dtype=str)
         df_raw = df_raw.where(pd.notna(df_raw), np.nan)
 st.success(f"已加载 **{st.session_state['name']}**：{df_raw.shape[0]} 行 × {df_raw.shape[1]} 字段")
-st.dataframe(df_raw.head(8), use_container_width=True)
+st.dataframe(df_raw.head(8), width='stretch')
 cols = list(df_raw.columns)
 id_candidates = ['(无ID列)'] + cols
 id_default = cols.index('__实验行ID__')+1 if '__实验行ID__' in cols else 0
@@ -125,18 +125,18 @@ cc1,cc2 = st.columns(2)
 with cc1:
     st.subheader("各列缺失数")
     if len(diag['miss']):
-        st.plotly_chart(px.bar(x=diag['miss'].index, y=diag['miss'].values, labels={'x':'列','y':'缺失数'}), use_container_width=True)
+        st.plotly_chart(px.bar(x=diag['miss'].index, y=diag['miss'].values, labels={'x':'列','y':'缺失数'}), width='stretch')
     else: st.write("无缺失")
 with cc2:
     st.subheader("IQR 异常值概览")
-    st.dataframe(diag['outliers'], use_container_width=True)
+    st.dataframe(diag['outliers'], width='stretch')
 cc3,cc4 = st.columns(2)
 with cc3:
     st.subheader("类型问题")
-    st.dataframe(diag['type_issues'], use_container_width=True)
+    st.dataframe(diag['type_issues'], width='stretch')
 with cc4:
     st.subheader("类别一致性")
-    st.dataframe(diag['cat_issues'], use_container_width=True)
+    st.dataframe(diag['cat_issues'], width='stretch')
 if st.session_state.get('demo') and os.path.exists(DEMO_LOG) and id_col=='__实验行ID__':
     st.subheader("🎯 检测召回率（仅演示数据，对照注入日志）")
     inj = pd.read_csv(DEMO_LOG)
@@ -158,7 +158,7 @@ if st.session_state.get('demo') and os.path.exists(DEMO_LOG) and id_col=='__实�
     rows.append(('异常值(域规则)',len(inj_o),len(det_o&inj_o)))
     rdf=pd.DataFrame(rows,columns=['类型','注入数','命中'])
     rdf['召回率']=(rdf['命中']/rdf['注入数']*100).round(1).astype(str)+"%"
-    st.dataframe(rdf, use_container_width=True)
+    st.dataframe(rdf, width='stretch')
 
 st.header("③ Agent 执行过程")
 if st.button("🚀 开始清洗", type="primary"):
@@ -212,13 +212,13 @@ if 'tools' in st.session_state:
 st.header("④ 清洗效果对比")
 if 'clean' in st.session_state:
     cmp=pd.DataFrame({"清洗前":st.session_state['before'],"清洗后":st.session_state['after']})
-    st.dataframe(cmp, use_container_width=True)
+    st.dataframe(cmp, width='stretch')
     st.plotly_chart(go.Figure(data=[
         go.Bar(name='清洗前',x=list(st.session_state['before'].keys()),y=list(st.session_state['before'].values())),
         go.Bar(name='清洗后',x=list(st.session_state['after'].keys()),y=list(st.session_state['after'].values()))]),
-        use_container_width=True)
+        width='stretch')
     st.subheader("清洗后预览")
-    st.dataframe(st.session_state['clean'].head(10), use_container_width=True)
+    st.dataframe(st.session_state['clean'].head(10), width='stretch')
     st.download_button("⬇️ 下载清洗后 CSV", st.session_state['clean'].to_csv(index=False).encode('utf-8-sig'),
                        "cleaned_data.csv","text/csv")
 else:
@@ -254,12 +254,12 @@ if 'clean' in st.session_state:
         with k1:
             st.metric("Macro-F1",f"{st.session_state['f1']:.4f}")
             vc=st.session_state['y'].value_counts()
-            st.plotly_chart(px.pie(values=vc.values,names=vc.index,title="类别分布"),use_container_width=True)
+            st.plotly_chart(px.pie(values=vc.values,names=vc.index,title="类别分布"),width='stretch')
         with k2:
             labels=sorted(st.session_state['y'].unique())
             cm=confusion_matrix(st.session_state['y'][df_c['split']=='test'],st.session_state['pred'],labels=labels)
             st.plotly_chart(go.Figure(data=go.Heatmap(z=cm,x=['预测'+l for l in labels],y=['真实'+l for l in labels],
-                text=cm,texttemplate='%{text}',colorscale='Blues')),use_container_width=True)
+                text=cm,texttemplate='%{text}',colorscale='Blues')),width='stretch')
         rep=classification_report(st.session_state['y'][df_c['split']=='test'],st.session_state['pred'])
         st.code(rep)
         st.download_button("⬇️ 下载实验报告(txt)",
