@@ -20,7 +20,7 @@ np.random.seed(SEED)
 _HERE = os.path.dirname(os.path.abspath(__file__))
 DEMO_PROB = os.path.join(_HERE, "data", "seoul_injected.csv")
 DEMO_LOG = os.path.join(_HERE, "data", "injection_log.csv")
-SEoul_RULES = {  # 仅演示数据召回率对照用
+SEoul_RULES = {
     'Hour': lambda s: ~s.between(0,23),
     'Humidity(%)': lambda s: ~s.between(0,100),
     'Rainfall(mm)': lambda s: (s<0)|(s>100),
@@ -245,7 +245,7 @@ if 'clean' in st.session_state:
         f1=f1_score(y[te],pred,average='macro')
         st.session_state['f1']=f1; st.session_state['y']=y; st.session_state['pred']=pred
         st.success(f"**测试集 Macro-F1 = {f1:.4f}**")
-    if 'f1' in st_session_state if False else 'f1' in st.session_state:
+    if 'f1' in st.session_state:
         k1,k2=st.columns(2)
         with k1:
             st.metric("Macro-F1",f"{st.session_state['f1']:.4f}")
