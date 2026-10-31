@@ -81,7 +81,11 @@ def diagnose(df_raw, id_col):
 st.header("① 数据上传与字段配置")
 up = st.file_uploader("上传 CSV 或 Excel", type=['csv','xlsx','xls'])
 if st.button("📂 加载演示：SeoulBike 问题注入数据"):
-    st.session_state['src']=DEMO_PROB; st.session_state['demo']=True; st.session_state['name']="SeoulBike问题注入(演示)"
+    if os.path.exists(DEMO_PROB):
+        st.session_state['src']=DEMO_PROB; st.session_state['demo']=True; st.session_state['name']="SeoulBike问题注入(演示)"
+    else:
+        st.session_state['demo']=False
+        st.warning("未找到内置演示数据，请在上方上传「02_问题注入数据_用于Agent测试.csv」。")
 if up is not None:
     st.session_state['src']=up; st.session_state['demo']=False; st.session_state['name']=up.name
 if 'src' not in st.session_state:
